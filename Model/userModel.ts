@@ -1,4 +1,5 @@
 import { UserEntity } from '../Entity/userEntity';
+import logger from '../Logger/logger';
 import QueryDB from '../Providers/DatabaseProvider';
 
 export class UserModel {
@@ -11,8 +12,8 @@ export class UserModel {
     try {
       let result = await QueryDB(query, values);
 
-      const insertedId = (result as any).insertId as number; //solves issue
-      return { id: insertedId, ...user };
+      const insertedId = (result as any).insertId as number; //solves issue of insertid
+      return { id: insertedId, ...user }; //user contains name,email and password
     } catch (error) {
       throw new Error('Failed to add user');
     }
@@ -24,13 +25,12 @@ export class UserModel {
 
     try {
       let rows = await QueryDB(query, values);
-      if (rows.length === 0) {
-        return null;
-      }
+      // console.log(rows[0]);
+
       if (!Array.isArray(rows) || rows.length === 0) {
         return null;
       } //solve error
-      const user = rows[0] as UserEntity;
+      const user = rows[0] as UserEntity; //row[0] contains id,nameemail and password
       return user;
     } catch (error) {
       throw new Error('Failed to get user');
@@ -56,7 +56,8 @@ export class UserModel {
     const values = [id];
 
     try {
-      await QueryDB(query, values);
+      const deleteUser = await QueryDB(query, values);
+      logger.info('deleteuser', deleteUser);
     } catch (error) {
       throw new Error('Failed to delete user');
     }

@@ -29,7 +29,7 @@ export class UserController {
       const user = await this.userService.getUser(userId);
 
       if (user) {
-        res.json(user);
+        res.status(200).json(user);
       } else {
         res.status(404).json({ error: 'User not found' });
       }
@@ -60,7 +60,8 @@ export class UserController {
     try {
       const userId = parseInt(req.params.id, 10);
       await this.userService.deleteUser(userId);
-      res.sendStatus(204);
+
+      res.status(200).json({ message: 'User deleted' });
     } catch (error) {
       res.status(500).json({ error: 'Failed to delete user' });
     }

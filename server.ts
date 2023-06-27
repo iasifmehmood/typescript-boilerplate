@@ -6,19 +6,29 @@ import { errorHandler } from './Middleware/errorHandler';
 import userRoutes from './Route/userRoutes';
 import { logRequestResponse } from './Middleware/logReqRes';
 import { incorrectRoute } from './Middleware/incorrectRoute';
+import YAML from 'yamljs';
+import swaggerUi from 'swagger-ui-express';
 
 const app: Application = express();
-
-// Middleware function to log requests and responses
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(logRequestResponse);
+
+//swagger API Testing
+const swaggerJsDocs = YAML.load('./Swagger/swagger.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJsDocs));
+
+// Middleware function to log requests and responses
+// app.use(logRequestResponse);
+
+//routes
 app.use('/users', userRoutes);
 
+//throw error if route is not correct
 app.use(incorrectRoute);
 
+//global error handling
 app.use(errorHandler);
 
 app.listen(process.env.PORT, () => {

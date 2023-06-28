@@ -1,8 +1,10 @@
+import { HashPassword } from '../Decorators/hashPassDecorator';
 import { UserEntity } from '../Entity/userEntity';
 import logger from '../Logger/logger';
 import QueryDB from '../Providers/DatabaseProvider';
 
 export class UserModel {
+  @HashPassword
   async addUser(user: UserEntity): Promise<UserEntity> {
     const { name, email, password } = user;
 
@@ -16,6 +18,21 @@ export class UserModel {
       return { id: insertedId, ...user }; //user contains name,email and password
     } catch (error) {
       throw new Error('Failed to add user');
+    }
+  }
+
+  @HashPassword
+  async updateUser(id: number, user: UserEntity): Promise<UserEntity | null> {
+    const { name, email, password } = user;
+    const query =
+      'UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?';
+    const values = [name, email, password, id];
+
+    try {
+      await QueryDB(query, values);
+      return { id, ...user };
+    } catch (error) {
+      throw new Error('Failed to update user');
     }
   }
 
@@ -34,20 +51,6 @@ export class UserModel {
       return user;
     } catch (error) {
       throw new Error('Failed to get user');
-    }
-  }
-
-  async updateUser(id: number, user: UserEntity): Promise<UserEntity | null> {
-    const { name, email, password } = user;
-    const query =
-      'UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?';
-    const values = [name, email, password, id];
-
-    try {
-      await QueryDB(query, values);
-      return { id, ...user };
-    } catch (error) {
-      throw new Error('Failed to update user');
     }
   }
 

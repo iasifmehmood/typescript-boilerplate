@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import { UserEntity } from '../Entity/userEntity';
 import { UserDTO } from '../DTO/UserDTO';
 import { UserService } from '../Services/UserService';
-
+import createValidationDecorator from '../Decorators/validationDecorator';
+import { nameEmailPasswordSchema } from '../Utils/zodValidationSchema';
 export class UserController {
   private userService: UserService;
 
@@ -10,6 +11,7 @@ export class UserController {
     this.userService = new UserService();
   }
 
+  @createValidationDecorator<UserDTO>(nameEmailPasswordSchema)
   async addUser(req: Request, res: Response): Promise<void> {
     try {
       const { name, email, password } = req.body as UserDTO;
@@ -38,6 +40,7 @@ export class UserController {
     }
   }
 
+  @createValidationDecorator<UserDTO>(nameEmailPasswordSchema)
   async updateUser(req: Request, res: Response): Promise<void> {
     try {
       const userId = parseInt(req.params.id, 10);
